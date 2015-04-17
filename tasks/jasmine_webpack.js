@@ -9,6 +9,7 @@ var path = require('path'),
 
     _ = require('underscore'),
     rimraf = require('rimraf'),
+    webpack = require('webpack'),
 
     jasmine = require('jasmine-core'),
 
@@ -17,7 +18,9 @@ var path = require('path'),
 module.exports = function(grunt) {
 
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
-        var options = this.options({
+        var done = this.async(),
+
+            options = this.options({
                 specRunnerDest: '_SpecRunner.html',
                 keepRunner: false,
                 styles: [],
@@ -27,72 +30,83 @@ module.exports = function(grunt) {
                 polyfills: []
             }),
 
-            outdir = path.dirname(options.specRunnerDest);
+            outdir = path.dirname(options.specRunnerDest),
 
-        [].concat(
-            jasmine.files.cssFiles,
-            jasmine.files.jsFiles,
-            jasmine.files.bootFiles
-        ).forEach(function (file) {
-            grunt.file.copy(
-                path.join(jasmine.files.path, file),
-                path.join(tempDir, file)
+            webpackConfig = _.defaults(options.webpack || {}, {
+                devtool: 'eval',
+                output: {
+                    path: tempDir + '/specs',
+                    filename: '[name].js',
+                    libraryTarget: 'var'
+                }
+            }),
+
+            entries = {},
+            specFiles = [];
+
+        // Webpack the test files.
+        this.filesSrc.forEach(function(f) {
+            var filename = path.basename(f, '.js');
+            specFiles.push(
+                path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
             );
+            entries[filename] = f;
         });
 
-        // Iterate over all specified file groups.
-        //this.testFiles.forEach(function(f) {
-        //    // Concat specified files.
-        //    var src = f.src.filter(function(filepath) {
-        //        // Warn on and remove invalid source files (if nonull was set).
-        //        if (!grunt.file.exists(filepath)) {
-        //            grunt.log.warn('Source file "' + filepath + '" not found.');
-        //            return false;
-        //        } else {
-        //            return true;
-        //        }
-        //    }).map(function(filepath) {
-        //        // Read file source.
-        //        return grunt.file.read(filepath);
-        //    }).join(grunt.util.normalizelf(options.separator));
+        webpackConfig.entry = entries;
 
-        //    // Handle options.
-        //    src += options.punctuation;
+        webpack(webpackConfig, function (err, stats) {
+            if (stats.hasErrors()) {
+                grunt.log.writeln("Got error when building webpack files: " + stats.toJson().errors);
+                done();
+                return;
+            }
 
-        //    // Print a success message.
-        //    grunt.log.writeln('File "' + f.dest + '" created.');
-        //});
+            // Copy Jasmine files into temp dir.
+            [].concat(
+                jasmine.files.cssFiles,
+                jasmine.files.jsFiles,
+                jasmine.files.bootFiles
+            ).forEach(function (file) {
+                grunt.file.copy(
+                    path.join(jasmine.files.path, file),
+                    path.join(tempDir, file)
+                );
+            });
 
-        grunt.file.write(
-            options.specRunnerDest,
-            _.template(grunt.file.read(__dirname + '/templates/SpecRunner.tmpl'))({
-                css: jasmine.files.cssFiles.map(function (cssFile) {
-                    return path.relative(outdir, path.join(tempDir, cssFile));
-                }),
-                scripts: {
-                    polyfills: options.polyfills,
-                    jasmine: jasmine.files.jsFiles.map(function (jsFile) {
-                        return path.relative(outdir, path.join(tempDir, jsFile));
+            grunt.file.write(
+                options.specRunnerDest,
+                _.template(grunt.file.read(__dirname + '/templates/SpecRunner.tmpl'))({
+                    css: jasmine.files.cssFiles.map(function (cssFile) {
+                        return path.relative(outdir, path.join(tempDir, cssFile));
                     }),
-                    specs: options.spec,
-                    helpers: options.helpers,
-                    vendor: options.vendor,
-                    src: options.src,
-                    boot: jasmine.files.bootFiles.map(function (bootFile) {
-                        return path.relative(outdir, path.join(tempDir, bootFile));
-                    }),
-                    reporters: []
-                }
-            })
-        );
+                    scripts: {
+                        polyfills: options.polyfills,
+                        jasmine: jasmine.files.jsFiles.map(function (jsFile) {
+                            return path.relative(outdir, path.join(tempDir, jsFile));
+                        }),
+                        specs: specFiles,
+                        helpers: options.helpers,
+                        vendor: options.vendor,
+                        src: options.src,
+                        boot: jasmine.files.bootFiles.map(function (bootFile) {
+                            return path.relative(outdir, path.join(tempDir, bootFile));
+                        }),
+                        reporters: []
+                    }
+                })
+            );
 
-        // RUN TESTS HERE.
+            // RUN TESTS HERE.
 
-        // Clean up.
-        if (!options.keepRunner) {
-            fs.unlink(options.specRunnerDest);
-            rimraf.sync(tempDir);
-        }
+            // Clean up.
+            if (!options.keepRunner) {
+                fs.unlink(options.specRunnerDest);
+                rimraf.sync(tempDir);
+            }
+
+            done();
+        });
     });
 
 };
