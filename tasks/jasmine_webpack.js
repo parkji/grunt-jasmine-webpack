@@ -4,9 +4,13 @@
 
 'use strict';
 
-var _ = require('underscore'),
+var path = require('path'),
+    fs = require('fs'),
+
+    _ = require('underscore'),
+    rimraf = require('rimraf'),
+
     jasmine = require('jasmine-core'),
-    path = require('path'),
 
     tempDir = '.grunt/grunt-jasmine-webpack';
 
@@ -15,6 +19,7 @@ module.exports = function(grunt) {
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
         var options = this.options({
                 specRunnerDest: '_SpecRunner.html',
+                keepRunner: false,
                 styles: [],
                 specs: [],
                 helpers: [],
@@ -80,7 +85,14 @@ module.exports = function(grunt) {
                 }
             })
         );
-        grunt.log.writeln('File "' + options.specRunnerDest + '" created');
+
+        // RUN TESTS HERE.
+
+        // Clean up.
+        if (!options.keepRunner) {
+            fs.unlink(options.specRunnerDest);
+            rimraf.sync(tempDir);
+        }
     });
 
 };
