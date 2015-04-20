@@ -41,6 +41,8 @@ module.exports = function(grunt) {
                 polyfills: []
             }),
 
+            testFilter = grunt.option('filter'),
+
             outdir = path.dirname(options.specRunnerDest),
 
             webpackConfig = _.defaults(options.webpack || {}, {
@@ -58,11 +60,19 @@ module.exports = function(grunt) {
         // Webpack the test files.
         this.filesSrc.forEach(function(f) {
             var filename = path.basename(f, '.js');
-            specFiles.push(
-                path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
-            );
-            entries[filename] = f;
+
+            if (!testFilter || filename.indexOf(testFilter) >= 0) {
+                specFiles.push(
+                    path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
+                );
+                entries[filename] = f;
+            }
         });
+
+        if (specFiles.length === 0) {
+            grunt.log.error('No tests found');
+            done(false);
+        }
 
         webpackConfig.entry = entries;
 
