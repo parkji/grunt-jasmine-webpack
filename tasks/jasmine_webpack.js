@@ -8,6 +8,7 @@ var path = require('path'),
     fs = require('fs'),
 
     _ = require('underscore'),
+    chalk = require('chalk'),
     rimraf = require('rimraf'),
     webpack = require('webpack'),
 
@@ -74,7 +75,7 @@ module.exports = function(grunt) {
 
             var indentLevel = 0,
                 totalSpecs = 0,
-                failedSpecs = [];
+                failedSpecs = 0;
 
             // Copy Jasmine files into temp dir.
             [].concat(
@@ -131,22 +132,16 @@ module.exports = function(grunt) {
                         rimraf.sync(tempDir);
                     }
 
-                    done();
+                    done(failedSpecs <= 0);
                 }
             });
 
             phantomjs.on('jasmine.done', function () {
-                grunt.log.ok('Jasmine suite finished.');
-                grunt.log.ok('Results: ' + (totalSpecs - failedSpecs.length) + '/' + totalSpecs + ' passed. There was ' + failedSpecs.length + ' failure.');
+                grunt.log.writeln(chalk.cyan('Results: ' + (totalSpecs - failedSpecs) + '/' + totalSpecs + ' passed.'));
+                if (failedSpecs > 0) {
+                    grunt.log.error(chalk.red(failedSpecs + ' failures'));
+                }
                 grunt.log.writeln('');
-
-                failedSpecs.forEach(function (failedSpec) {
-                    grunt.log.error(failedSpec.fullName);
-                    failedSpec.failedExpectations.forEach(function (fe) {
-                        grunt.log.error(fe.message);
-                    });
-                    grunt.log.writeln('');
-                });
                 phantomjs.halt();
             });
 
@@ -174,15 +169,28 @@ module.exports = function(grunt) {
 
             phantomjs.on('jasmine.specDone', function (specMetadata) {
                 specMetadata.passedExpectations.forEach(function (expectation) {
-                    grunt.log.writeln(getTabs(indentLevel) + "OK: " + specMetadata.description);
+                    grunt.log.writeln(
+                        getTabs(indentLevel) +
+                        chalk.green("PASS: ") +
+                        chalk.gray(specMetadata.description)
+                    );
                 });
 
                 specMetadata.failedExpectations.forEach(function (expectation) {
-                    grunt.log.writeln(getTabs(indentLevel) + "FAIL: " + specMetadata.description);
+                    grunt.log.writeln(
+                        getTabs(indentLevel) +
+                        chalk.red("FAIL: ") +
+                        chalk.gray(specMetadata.description)
+                    );
+
+                    grunt.log.writeln(
+                        getTabs(indentLevel) +
+                        chalk.red(expectation.message)
+                    );
                 });
 
                 if (specMetadata.failedExpectations.length !== 0) {
-                    failedSpecs.push(specMetadata);
+                    failedSpecs++;
                 }
 
                 indentLevel--;
