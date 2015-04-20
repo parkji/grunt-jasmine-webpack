@@ -39,6 +39,7 @@
     "gruntplugin"
   ],
   "dependencies": {
+    "grunt-lib-phantomjs": "^0.7.0",
     "jasmine-core": "^2.2.0",
     "rimraf": "^2.3.2",
     "underscore": "^1.8.3",
