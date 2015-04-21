@@ -35,7 +35,6 @@ module.exports = function(grunt) {
                 specRunnerDest: '_SpecRunner.html',
                 keepRunner: false,
                 styles: [],
-                specs: [],
                 helpers: [],
                 vendor: [],
                 polyfills: []
@@ -79,7 +78,7 @@ module.exports = function(grunt) {
         webpack(webpackConfig, function (err, stats) {
             if (stats.hasErrors()) {
                 grunt.log.writeln("Got error when building webpack files: " + stats.toJson().errors);
-                done(false);
+                done();
                 return;
             }
 
@@ -99,6 +98,19 @@ module.exports = function(grunt) {
                 );
             });
 
+            [].concat(
+                options.styles,
+                options.helpers,
+                options.vendor,
+                options.polyfills
+            ).forEach(function (file) {
+                var basename = path.basename(file);
+                grunt.file.copy(
+                    file,
+                    path.join(tempDir, basename)
+                );
+            });
+
             grunt.file.copy(
                 __dirname + '/reporters/phantom-reporter.js',
                 path.join(tempDir, 'reporter.js')
@@ -111,17 +123,32 @@ module.exports = function(grunt) {
                         return path.relative(outdir, path.join(tempDir, cssFile));
                     }),
                     scripts: {
-                        polyfills: options.polyfills,
+                        specs: specFiles,
+
                         jasmine: jasmine.files.jsFiles.map(function (jsFile) {
                             return path.relative(outdir, path.join(tempDir, jsFile));
                         }),
-                        specs: specFiles,
-                        helpers: options.helpers,
-                        vendor: options.vendor,
-                        src: options.src,
                         boot: jasmine.files.bootFiles.map(function (bootFile) {
                             return path.relative(outdir, path.join(tempDir, bootFile));
                         }),
+
+                        styles: options.styles.map(function (f) {
+                            var basename = path.basename(f);
+                            return path.relative(outdir, path.join(tempDir, basename));
+                        }),
+                        helpers: options.helpers.map(function (f) {
+                            var basename = path.basename(f);
+                            return path.relative(outdir, path.join(tempDir, basename));
+                        }),
+                        vendor: options.vendor.map(function (f) {
+                            var basename = path.basename(f);
+                            return path.relative(outdir, path.join(tempDir, basename));
+                        }),
+                        polyfills: options.polyfills.map(function (f) {
+                            var basename = path.basename(f);
+                            return path.relative(outdir, path.join(tempDir, basename));
+                        }),
+
                         reporters: [path.relative(outdir, path.join(tempDir, 'reporter.js'))]
                     }
                 })
