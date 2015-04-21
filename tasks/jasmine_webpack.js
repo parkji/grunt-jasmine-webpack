@@ -139,10 +139,12 @@ module.exports = function(grunt) {
                     // Clean up.
                     if (!options.keepRunner) {
                         fs.unlink(options.specRunnerDest);
-                        rimraf.sync(tempDir);
+                        rimraf(tempDir, function () {
+                            done(failedSpecs <= 0);
+                        });
+                    } else {
+                        done(failedSpecs <= 0);
                     }
-
-                    done(failedSpecs <= 0);
                 }
             });
 
