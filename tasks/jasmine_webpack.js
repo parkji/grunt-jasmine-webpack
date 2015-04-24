@@ -9,7 +9,6 @@ var path = require('path'),
 
     _ = require('underscore'),
     chalk = require('chalk'),
-    rimraf = require('rimraf'),
     webpack = require('webpack'),
 
     jasmine = require('jasmine-core'),
@@ -19,13 +18,29 @@ var path = require('path'),
 module.exports = function(grunt) {
 
     var getTabs = function getTabs(indentLevel) {
-        var ret = [];
-        for (var i = 0; i < indentLevel; i++) {
-            ret.push('  ');
-        }
+            var ret = [];
+            for (var i = 0; i < indentLevel; i++) {
+                ret.push('  ');
+            }
 
-        return ret.join('');
-    }
+            return ret.join('');
+        },
+
+        fileContainsFilter = function (file, filter) {
+            var dirRegex = new RegExp(/^\//);
+
+            if (dirRegex.test(filter)) {
+                if (file.indexOf(filter) >= 0) {
+                    return true;
+                }
+            } else {
+                if (path.basename(file, '.js').indexOf(filter) >= 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
 
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
         var done = this.async(),
@@ -60,7 +75,7 @@ module.exports = function(grunt) {
         this.filesSrc.forEach(function(f) {
             var filename = path.basename(f, '.js');
 
-            if (!testFilter || filename.indexOf(testFilter) >= 0) {
+            if (!testFilter || fileContainsFilter(f, testFilter)) {
                 specFiles.push(
                     path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
                 );
@@ -156,22 +171,33 @@ module.exports = function(grunt) {
 
             // RUN TESTS HERE.
             phantomjs.spawn(options.specRunnerDest, {
-                failCode: 90,
-                options: {},
                 done: function (err) {
-                    if (err) {
-                        grunt.log.error(err);
-                    }
-
                     // Clean up.
                     if (!options.keepRunner) {
-                        fs.unlink(options.specRunnerDest);
-                        rimraf(tempDir, function () {
-                            done(failedSpecs <= 0);
+                        // Bit of a faff here, but basically I coudn't get rimraf
+                        // to work without causing phantom to crash, so here
+                        // we find and remove all files and dirs we've created.
+                        var subdirs = [];
+                        fs.unlinkSync(options.specRunnerDest);
+                        grunt.file.recurse(tempDir, function (filepath, rootdir, subdir) {
+                            fs.unlinkSync(filepath);
+                            if (subdir) {
+                                subdirs.push(path.join(rootdir, subdir));
+                            }
                         });
-                    } else {
-                        done(failedSpecs <= 0);
+                        subdirs.forEach(function (dir) {
+                            try {
+                                fs.rmdirSync(dir);
+                            } catch (e) {}
+                        });
+                        fs.rmdirSync(tempDir);
+
+                        // Try to remove .grunt as well, but there could be other things in there.
+                        try {
+                            fs.rmdirSync('.grunt');
+                        } catch (e) {}
                     }
+                    done(failedSpecs <= 0);
                 }
             });
 

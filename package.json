@@ -39,11 +39,10 @@
     "gruntplugin"
   ],
   "dependencies": {
-    "chalk": "^1.0.0",
-    "grunt-lib-phantomjs": "^0.7.0",
-    "jasmine-core": "^2.2.0",
-    "rimraf": "^2.3.2",
-    "underscore": "^1.8.3",
-    "webpack": "^1.8.5"
+    "chalk": "1.0.0",
+    "grunt-lib-phantomjs": "0.7.0",
+    "jasmine-core": "2.2.0",
+    "underscore": "1.8.3",
+    "webpack": "1.8.5"
   }
 }
