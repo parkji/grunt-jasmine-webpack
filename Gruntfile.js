@@ -28,14 +28,16 @@ module.exports = function(grunt) {
         },
 
         jasmine_webpack: {
-            options: {
-                webpack: {
-                    resolve: {
-                        root: './'
+            example: {
+                options: {
+                    webpack: {
+                        resolve: {
+                            root: './'
+                        }
                     }
-                }
-            },
-            src: 'example/**/*.js'
+                },
+                src: 'example/**/*.js'
+            }
         }
     });
 
@@ -46,7 +48,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
 
-    grunt.registerTask('example', ['clean', 'jasmine_webpack']);
+    grunt.registerTask('example', ['clean', 'jasmine_webpack:example']);
 
     // By default, lint and run all tests.
     grunt.registerTask('default', ['jshint']);

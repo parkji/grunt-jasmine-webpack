@@ -8,9 +8,10 @@ var path = require('path'),
     fs = require('fs'),
 
     _ = require('underscore'),
-    chalk = require('chalk'),
     webpack = require('webpack'),
     minimatch = require('minimatch'),
+
+    Reporter = require('./lib/Reporter'),
 
     jasmine = require('jasmine-core'),
 
@@ -18,14 +19,7 @@ var path = require('path'),
 
 module.exports = function(grunt) {
 
-    var getTabs = function getTabs(indentLevel) {
-            var ret = [];
-            for (var i = 0; i < indentLevel; i++) {
-                ret.push('  ');
-            }
-
-            return ret.join('');
-        };
+    var reporter = new Reporter(grunt);
 
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
         var done = this.async(),
@@ -187,63 +181,37 @@ module.exports = function(grunt) {
             });
 
             phantomjs.on('jasmine.done', function () {
-                grunt.log.writeln(chalk.cyan('Results: ' + (totalSpecs - failedSpecs) + '/' + totalSpecs + ' passed.'));
-                if (failedSpecs > 0) {
-                    grunt.log.error(chalk.red(failedSpecs + ' failures'));
-                }
-                grunt.log.writeln('');
+                reporter.reportFinish(totalSpecs, failedSpecs);
+                grunt.verbose.writeln('Halting phantomjs');
                 phantomjs.halt();
             });
 
             phantomjs.on('jasmine.started', function () {
-                grunt.log.ok('Jasmine suite started');
+                grunt.verbose.ok('Jasmine suite started');
             });
 
             phantomjs.on('jasmine.suiteStarted', function (suiteMetadata) {
-                // Increment indent level.
-                indentLevel++;
-                grunt.log.writeln(getTabs(indentLevel) + suiteMetadata.description);
+                reporter.reportSuiteStarted(suiteMetadata.description);
             });
 
             phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
-                indentLevel--;
-                if (indentLevel < 2) {
-                    grunt.log.writeln('');
-                }
+                reporter.reportSuiteDone();
             });
 
             phantomjs.on('jasmine.specStarted', function (specMetadata) {
-                indentLevel++;
                 totalSpecs++;
             });
 
             phantomjs.on('jasmine.specDone', function (specMetadata) {
-                specMetadata.passedExpectations.forEach(function (expectation) {
-                    grunt.log.writeln(
-                        getTabs(indentLevel) +
-                        chalk.green("PASS: ") +
-                        chalk.gray(specMetadata.description)
-                    );
-                });
-
-                specMetadata.failedExpectations.forEach(function (expectation) {
-                    grunt.log.writeln(
-                        getTabs(indentLevel) +
-                        chalk.red("FAIL: ") +
-                        chalk.gray(specMetadata.description)
-                    );
-
-                    grunt.log.writeln(
-                        getTabs(indentLevel) +
-                        chalk.red(expectation.message)
-                    );
-                });
+                reporter.reportSpec(
+                    specMetadata.description,
+                    specMetadata.passedExpectations,
+                    specMetadata.failedExpectations
+                );
 
                 if (specMetadata.failedExpectations.length !== 0) {
                     failedSpecs++;
                 }
-
-                indentLevel--;
             });
         });
     });
