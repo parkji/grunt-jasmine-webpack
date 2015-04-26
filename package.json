@@ -42,6 +42,7 @@
     "chalk": "1.0.0",
     "grunt-lib-phantomjs": "0.7.0",
     "jasmine-core": "2.2.0",
+    "minimatch": "2.0.4",
     "underscore": "1.8.3",
     "webpack": "1.8.5"
   }

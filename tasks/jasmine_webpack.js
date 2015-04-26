@@ -10,6 +10,7 @@ var path = require('path'),
     _ = require('underscore'),
     chalk = require('chalk'),
     webpack = require('webpack'),
+    minimatch = require('minimatch'),
 
     jasmine = require('jasmine-core'),
 
@@ -24,22 +25,6 @@ module.exports = function(grunt) {
             }
 
             return ret.join('');
-        },
-
-        fileContainsFilter = function (file, filter) {
-            var dirRegex = new RegExp(/^\//);
-
-            if (dirRegex.test(filter)) {
-                if (file.indexOf(filter) >= 0) {
-                    return true;
-                }
-            } else {
-                if (path.basename(file, '.js').indexOf(filter) >= 0) {
-                    return true;
-                }
-            }
-
-            return false;
         };
 
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
@@ -75,7 +60,7 @@ module.exports = function(grunt) {
         this.filesSrc.forEach(function(f) {
             var filename = path.basename(f, '.js');
 
-            if (!testFilter || fileContainsFilter(f, testFilter)) {
+            if (!testFilter || minimatch(f, testFilter, {matchBase: true})) {
                 specFiles.push(
                     path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
                 );
