@@ -76,8 +76,7 @@ module.exports = function(grunt) {
                 return;
             }
 
-            var indentLevel = 0,
-                totalSpecs = 0,
+            var totalSpecs = 0,
                 failedSpecs = 0;
 
             // Copy Jasmine files into temp dir.
