@@ -26,6 +26,14 @@ Type: `Boolean`
 
 Whether or not to keep the spec runner file once the process has finished. Defaults to `false`.
 
+This is useful if you need to see any output from the console. You can open the spec runner file in a browser, or combine `jasmine_webpack` with `watch` and `connect` (maybe, haven't tried that yet...).
+
+#### helpers
+
+Type: `Array<String>`
+
+Helper files to include in the spec runner.
+
 #### vendor
 
 Type: `Array<String>`
@@ -84,4 +92,11 @@ jasmine_webpack: {
     }
 }
 ```
-    
+## Known issues
+
+* There is a known problem that sometimes phantomjs doesn't exit cleanly, causing the task to fail. Haven't had enough time to properly look into that, but pull requests are welcome :)    
+
+## TODO
+
+* Unit tests
+* Figure out why phantomjs doesn't exit cleanly all the time
