@@ -55,6 +55,12 @@ Config for webpack, defaults:
 }
 ```
 
+#### styles
+
+Type: `Array<String>`
+
+CSS stylesheets to include in the spec runner.
+
 ### Usage examples
 
 ```javascript
@@ -71,7 +77,8 @@ jasmine_webpack: {
                 }
             },
             keepRunner: true,
-            vendor: ['path/top/vendor/file.js']
+            vendor: ['path/to/vendor/file.js'],
+            styles: ['path/to/css/styles.css']
         },
         src: './src/js/test/**/*.test.js'
     }

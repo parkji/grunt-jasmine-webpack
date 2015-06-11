@@ -114,7 +114,10 @@ module.exports = function(grunt) {
                 _.template(grunt.file.read(__dirname + '/templates/SpecRunner.tmpl'))({
                     css: jasmine.files.cssFiles.map(function (cssFile) {
                         return path.relative(outdir, path.join(tempDir, cssFile));
-                    }),
+                    }).concat(options.styles.map(function (f) {
+                        var basename = path.basename(f);
+                        return path.relative(outdir, path.join(tempDir, basename));
+                    })),
                     scripts: {
                         specs: specFiles,
 
@@ -125,10 +128,6 @@ module.exports = function(grunt) {
                             return path.relative(outdir, path.join(tempDir, bootFile));
                         }),
 
-                        styles: options.styles.map(function (f) {
-                            var basename = path.basename(f);
-                            return path.relative(outdir, path.join(tempDir, basename));
-                        }),
                         helpers: options.helpers.map(function (f) {
                             var basename = path.basename(f);
                             return path.relative(outdir, path.join(tempDir, basename));
