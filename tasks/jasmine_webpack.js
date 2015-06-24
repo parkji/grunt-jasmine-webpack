@@ -28,6 +28,7 @@ module.exports = function(grunt) {
             options = this.options({
                 specRunnerDest: '_SpecRunner.html',
                 keepRunner: false,
+                norun: false,
                 styles: [],
                 helpers: [],
                 vendor: [],
@@ -49,6 +50,10 @@ module.exports = function(grunt) {
 
             entries = {},
             specFiles = [];
+
+        if (options.norun) {
+            options.keepRunner = true;
+        }
 
         // Webpack the test files.
         this.filesSrc.forEach(function(f) {
@@ -146,71 +151,76 @@ module.exports = function(grunt) {
                 })
             );
 
-            // RUN TESTS HERE.
-            phantomjs.spawn(options.specRunnerDest, {
-                done: function (err) {
-                    // Clean up.
-                    if (!options.keepRunner) {
-                        // Bit of a faff here, but basically I coudn't get rimraf
-                        // to work without causing phantom to crash, so here
-                        // we find and remove all files and dirs we've created.
-                        var subdirs = [];
-                        fs.unlinkSync(options.specRunnerDest);
-                        grunt.file.recurse(tempDir, function (filepath, rootdir, subdir) {
-                            fs.unlinkSync(filepath);
-                            if (subdir) {
-                                subdirs.push(path.join(rootdir, subdir));
-                            }
-                        });
-                        subdirs.forEach(function (dir) {
+            if (!options.norun) {
+                // Run tests in phantomjs, if options.norun is false.
+                phantomjs.spawn(options.specRunnerDest, {
+                    done: function (err) {
+                        // Clean up.
+                        if (!options.keepRunner) {
+                            // Bit of a faff here, but basically I coudn't get rimraf
+                            // to work without causing phantom to crash, so here
+                            // we find and remove all files and dirs we've created.
+                            var subdirs = [];
+                            fs.unlinkSync(options.specRunnerDest);
+                            grunt.file.recurse(tempDir, function (filepath, rootdir, subdir) {
+                                fs.unlinkSync(filepath);
+                                if (subdir) {
+                                    subdirs.push(path.join(rootdir, subdir));
+                                }
+                            });
+                            subdirs.forEach(function (dir) {
+                                try {
+                                    fs.rmdirSync(dir);
+                                } catch (e) {}
+                            });
+                            fs.rmdirSync(tempDir);
+
+                            // Try to remove .grunt as well, but there could be other things in there.
                             try {
-                                fs.rmdirSync(dir);
+                                fs.rmdirSync('.grunt');
                             } catch (e) {}
-                        });
-                        fs.rmdirSync(tempDir);
-
-                        // Try to remove .grunt as well, but there could be other things in there.
-                        try {
-                            fs.rmdirSync('.grunt');
-                        } catch (e) {}
+                        }
+                        done(failedSpecs <= 0);
                     }
-                    done(failedSpecs <= 0);
-                }
-            });
+                });
 
-            phantomjs.on('jasmine.done', function () {
-                reporter.reportFinish(totalSpecs, failedSpecs);
-                grunt.verbose.writeln('Halting phantomjs');
-                phantomjs.halt();
-            });
+                phantomjs.on('jasmine.done', function () {
+                    reporter.reportFinish(totalSpecs, failedSpecs);
+                    grunt.verbose.writeln('Halting phantomjs');
+                    phantomjs.halt();
+                });
 
-            phantomjs.on('jasmine.started', function () {
-                grunt.verbose.ok('Jasmine suite started');
-            });
+                phantomjs.on('jasmine.started', function () {
+                    grunt.verbose.ok('Jasmine suite started');
+                });
 
-            phantomjs.on('jasmine.suiteStarted', function (suiteMetadata) {
-                reporter.reportSuiteStarted(suiteMetadata.description);
-            });
+                phantomjs.on('jasmine.suiteStarted', function (suiteMetadata) {
+                    reporter.reportSuiteStarted(suiteMetadata.description);
+                });
 
-            phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
-                reporter.reportSuiteDone();
-            });
+                phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
+                    reporter.reportSuiteDone();
+                });
 
-            phantomjs.on('jasmine.specStarted', function (specMetadata) {
-                totalSpecs++;
-            });
+                phantomjs.on('jasmine.specStarted', function (specMetadata) {
+                    totalSpecs++;
+                });
 
-            phantomjs.on('jasmine.specDone', function (specMetadata) {
-                reporter.reportSpec(
-                    specMetadata.description,
-                    specMetadata.passedExpectations,
-                    specMetadata.failedExpectations
-                );
+                phantomjs.on('jasmine.specDone', function (specMetadata) {
+                    reporter.reportSpec(
+                        specMetadata.description,
+                        specMetadata.passedExpectations,
+                        specMetadata.failedExpectations
+                    );
 
-                if (specMetadata.failedExpectations.length !== 0) {
-                    failedSpecs++;
-                }
-            });
+                    if (specMetadata.failedExpectations.length !== 0) {
+                        failedSpecs++;
+                    }
+                });
+            } else {
+                done();
+                return;
+            }
         });
     });
 };

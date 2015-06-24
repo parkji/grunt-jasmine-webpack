@@ -37,7 +37,15 @@ Type: `Boolean`
 
 Whether or not to keep the spec runner file once the process has finished. Defaults to `false`.
 
-This is useful if you need to see any output from the console. You can open the spec runner file in a browser, or combine `jasmine_webpack` with `watch` and `connect` (maybe, haven't tried that yet...).
+This is useful if you need to see any output from the console. You can open the spec runner file in a browser.
+
+#### norun
+
+Type: `Boolean`
+
+Whether or not to run the tests in phantomjs after the webpack build. If this is `true`, `options.keepRunner` will be set to `true` as well. This is useful for combining with (grunt-contrib-connect)[https://github.com/gruntjs/grunt-contrib-connect] to run the tests in a browser.
+
+Defaults to `false`.
 
 #### helpers
 
@@ -112,3 +120,8 @@ jasmine_webpack: {
 
 * Unit tests
 * Figure out why phantomjs doesn't exit cleanly all the time
+
+## Release History
+
+* 2015-06-24    v0.2.0    Adds norun option and npm installation instructions to README.
+* 2015-06-20    v0.1.0    Initial release.
