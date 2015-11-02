@@ -77,7 +77,7 @@ module.exports = function(grunt) {
         webpack(webpackConfig, function (err, stats) {
             if (stats.hasErrors()) {
                 grunt.log.writeln("Got error when building webpack files: " + stats.toJson().errors);
-                done();
+                done(false);
                 return;
             }
 
