@@ -123,6 +123,7 @@ jasmine_webpack: {
 
 ## Release History
 
+* 2015-11-02    v0.2.2    Fixes bug where task fails if webpack build fails.
 * 2015-10-19    v0.2.1    Fixes bug with phantomjs not exiting cleanly.
 * 2015-06-24    v0.2.0    Adds norun option and npm installation instructions to README.
 * 2015-06-20    v0.1.0    Initial release.
