@@ -112,10 +112,6 @@ jasmine_webpack: {
 }
 ```
 
-## Known issues
-
-* There is a known problem that sometimes phantomjs doesn't exit cleanly, causing the task to fail. Haven't had enough time to properly look into that, but pull requests are welcome :)
-
 ## TODO
 
 * Unit tests
