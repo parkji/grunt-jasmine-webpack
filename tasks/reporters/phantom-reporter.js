@@ -1,20 +1,23 @@
+/* globals window,alert,jasmine */
 'use strict';
 
 (function () {
-    var sendMessage = function sendMessage() {
-        var args = [].slice.call(arguments);
+    var sendMessage = function sendMessage () {
+            var args = [].slice.call(arguments);
 
-        if (window._phantom) {
-            alert(JSON.stringify(args));
-        }
-    };
+            /* eslint-disable */
+            if (window._phantom) {
+                alert(JSON.stringify(args));
+            }
+            /* eslint-enable */
+        },
 
-    var PhantomReporter = function () {
-        this.started = false;
-        this.finished = false;
-        this.suites = [];
-        this.results = {};
-    };
+        PhantomReporter = function () {
+            this.started = false;
+            this.finished = false;
+            this.suites = [];
+            this.results = {};
+        };
 
     PhantomReporter.prototype.jasmineStarted = function () {
         this.started = true;

@@ -12,14 +12,8 @@ module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        jshint: {
-            all: [
-                'Gruntfile.js',
-                'tasks/**/*.js'
-            ],
-            options: {
-                jshintrc: '.jshintrc'
-            }
+        eslint: {
+            target: ['tasks/**/*.js']
         },
 
         // Before generating any new files, remove any previously-created files.
@@ -45,7 +39,7 @@ module.exports = function(grunt) {
     grunt.loadTasks('tasks');
 
     // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     grunt.registerTask('example', ['clean', 'jasmine_webpack:example']);

@@ -10,9 +10,10 @@ var _ = require('underscore'),
 
     Reporter;
 
-indent = function indent(level) {
-    var tabs = [];
-    for (var i = 0; i < level; i++) {
+indent = function (level) {
+    var tabs = [],
+        i;
+    for (i = 0; i < level; i++) {
         tabs.push('  ');
     }
     return tabs.join('');
@@ -51,7 +52,7 @@ _.extend(Reporter.prototype, {
             );
         }
 
-        passedExpectations.forEach(function (expectation) {
+        passedExpectations.forEach(function () {
             this.grunt.log.writeln(
                 indent(this.indentLevel) +
                 chalk.green("PASS: ") +
@@ -77,7 +78,7 @@ _.extend(Reporter.prototype, {
 
     reportFinish: function (stats) {
         var totalSpecsRan = stats.passedSpecs + stats.failedSpecs;
-        this.grunt.log.writeln(chalk.cyan('Results: ' + (stats.passedSpecs) + '/' + totalSpecsRan + ' passed.'));
+        this.grunt.log.writeln(chalk.cyan('Results: ' + stats.passedSpecs + '/' + totalSpecsRan + ' passed.'));
         if (stats.skippedSpecs > 0) {
             this.grunt.log.writeln(chalk.yellow(stats.skippedSpecs + ' spec(s) skipped.'));
         }

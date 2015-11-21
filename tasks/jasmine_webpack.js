@@ -1,6 +1,7 @@
 /**
  * grunt-jasmine-webpack
  */
+ /* globals __dirname*/
 
 'use strict';
 
@@ -17,11 +18,11 @@ var path = require('path'),
 
     tempDir = '.grunt/grunt-jasmine-webpack';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     var reporter = new Reporter(grunt);
 
-    grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function() {
+    grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function () {
         var done = this.async(),
             phantomjs = require('grunt-lib-phantomjs').init(grunt),
 
@@ -56,7 +57,7 @@ module.exports = function(grunt) {
         }
 
         // Webpack the test files.
-        this.filesSrc.forEach(function(f) {
+        this.filesSrc.forEach(function (f) {
             var filename = path.basename(f, '.js');
 
             if (!testFilter || minimatch(f, testFilter, {matchBase: true})) {
@@ -114,13 +115,13 @@ module.exports = function(grunt) {
             });
 
             grunt.file.copy(
-                __dirname + '/reporters/phantom-reporter.js',
+                path.join(__dirname, '/reporters/phantom-reporter.js'),
                 path.join(tempDir, 'reporter.js')
             );
 
             grunt.file.write(
                 options.specRunnerDest,
-                _.template(grunt.file.read(__dirname + '/templates/SpecRunner.tmpl'))({
+                _.template(grunt.file.read(path.join(__dirname, '/templates/SpecRunner.tmpl')))({
                     css: jasmine.files.cssFiles.map(function (cssFile) {
                         return path.relative(outdir, path.join(tempDir, cssFile));
                     }).concat(options.styles.map(function (f) {
@@ -158,7 +159,7 @@ module.exports = function(grunt) {
             if (!options.norun) {
                 // Run tests in phantomjs, if options.norun is false.
                 phantomjs.spawn(options.specRunnerDest, {
-                    done: function (err) {
+                    done: function () {
                         // Clean up.
                         if (!options.keepRunner) {
                             // Bit of a faff here, but basically I coudn't get rimraf
@@ -217,7 +218,7 @@ module.exports = function(grunt) {
                     }
                 });
 
-                phantomjs.on('jasmine.specStarted', function (specMetadata) {
+                phantomjs.on('jasmine.specStarted', function () {
                     totalSpecs++;
                 });
 
