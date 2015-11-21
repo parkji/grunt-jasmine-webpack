@@ -29,15 +29,27 @@ _.extend(Reporter.prototype, {
         this.grunt.log.writeln(indent(this.indentLevel) + description);
     },
 
-    reportSuiteDone: function () {
+    reportSuiteDone: function (disabled) {
+        if (disabled) {
+            this.grunt.log.writeln(indent(++this.indentLevel) + chalk.yellow('Suite skipped'));
+            this.indentLevel--;
+        }
         this.indentLevel--;
         if (this.indentLevel === 0) {
             this.grunt.log.writeln('');
         }
     },
 
-    reportSpec: function (description, passedExpectations, failedExpectations) {
+    reportSpec: function (description, skipped, passedExpectations, failedExpectations) {
         this.indentLevel++;
+
+        if (skipped) {
+            this.grunt.log.writeln(
+                indent(this.indentLevel) +
+                chalk.yellow("SKIPPED: ") +
+                chalk.grey(description)
+            );
+        }
 
         passedExpectations.forEach(function (expectation) {
             this.grunt.log.writeln(
@@ -63,10 +75,17 @@ _.extend(Reporter.prototype, {
         this.indentLevel--;
     },
 
-    reportFinish: function (totalSpecs, failedSpecs) {
-        this.grunt.log.writeln(chalk.cyan('Results: ' + (totalSpecs - failedSpecs) + '/' + totalSpecs + ' passed.'));
-        if (failedSpecs > 0) {
-            this.grunt.log.error(chalk.red(failedSpecs + ' failures'));
+    reportFinish: function (stats) {
+        var totalSpecsRan = stats.passedSpecs + stats.failedSpecs;
+        this.grunt.log.writeln(chalk.cyan('Results: ' + (stats.passedSpecs) + '/' + totalSpecsRan + ' passed.'));
+        if (stats.skippedSpecs > 0) {
+            this.grunt.log.writeln(chalk.yellow(stats.skippedSpecs + ' spec(s) skipped.'));
+        }
+        if (stats.skippedSuites > 0) {
+            this.grunt.log.writeln(chalk.yellow(stats.skippedSuites + ' suite(s) skipped.'));
+        }
+        if (stats.failedSpecs > 0) {
+            this.grunt.log.error(chalk.red(stats.failedSpecs + ' failures'));
         }
     }
 });

@@ -82,7 +82,11 @@ module.exports = function(grunt) {
             }
 
             var totalSpecs = 0,
-                failedSpecs = 0;
+                passedSpecs = 0,
+                failedSpecs = 0,
+                skippedSpecs = 0,
+
+                skippedSuites = 0;
 
             // Copy Jasmine files into temp dir.
             [].concat(
@@ -185,7 +189,13 @@ module.exports = function(grunt) {
                 });
 
                 phantomjs.on('jasmine.done', function () {
-                    reporter.reportFinish(totalSpecs, failedSpecs);
+                    reporter.reportFinish({
+                        totalSpecs: totalSpecs,
+                        passedSpecs: passedSpecs,
+                        failedSpecs: failedSpecs,
+                        skippedSpecs: skippedSpecs,
+                        skippedSuites: skippedSuites
+                    });
                     grunt.verbose.writeln('Halting phantomjs');
                     phantomjs.halt();
                 });
@@ -199,7 +209,12 @@ module.exports = function(grunt) {
                 });
 
                 phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
-                    reporter.reportSuiteDone();
+                    var disabled = suiteMetadata.status === 'disabled';
+                    reporter.reportSuiteDone(disabled);
+
+                    if (disabled) {
+                        skippedSuites++;
+                    }
                 });
 
                 phantomjs.on('jasmine.specStarted', function (specMetadata) {
@@ -207,14 +222,20 @@ module.exports = function(grunt) {
                 });
 
                 phantomjs.on('jasmine.specDone', function (specMetadata) {
+                    var skipped = specMetadata.status === 'pending';
                     reporter.reportSpec(
                         specMetadata.description,
+                        skipped,
                         specMetadata.passedExpectations,
                         specMetadata.failedExpectations
                     );
 
                     if (specMetadata.failedExpectations.length !== 0) {
                         failedSpecs++;
+                    } else if (skipped) {
+                        skippedSpecs++;
+                    } else {
+                        passedSpecs++;
                     }
                 });
             } else {

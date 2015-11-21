@@ -1,4 +1,6 @@
 describe('First example', function () {
+    xdescribe('skipped suite', function () {});
+
     describe('truthyness', function () {
         it('should be true for true', function () {
             // Deliberately failing.
@@ -11,5 +13,7 @@ describe('First example', function () {
         it('should be true for string', function () {
             expect('this is true').toBeTruthy();
         });
+
+        xit('skipped spec', function () {});
     });
 });
