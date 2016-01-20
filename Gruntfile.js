@@ -8,7 +8,7 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
@@ -21,7 +21,7 @@ module.exports = function(grunt) {
             tests: ['.grunt']
         },
 
-        jasmine_webpack: {
+        jasmine_webpack: { // eslint-disable-line camelcase
             example: {
                 options: {
                     webpack: {
@@ -45,5 +45,5 @@ module.exports = function(grunt) {
     grunt.registerTask('example', ['clean', 'jasmine_webpack:example']);
 
     // By default, lint and run all tests.
-    grunt.registerTask('default', ['jshint']);
+    grunt.registerTask('default', ['eslint']);
 };
