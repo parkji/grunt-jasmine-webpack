@@ -36,7 +36,10 @@ module.exports = function (grunt) {
                 polyfills: []
             }),
 
-            testFilter = grunt.option('filter'),
+            filter = grunt.option('filter'),
+            fileFilter,
+            suiteFilter,
+            specFilter,
 
             outdir = path.dirname(options.specRunnerDest),
 
@@ -52,6 +55,13 @@ module.exports = function (grunt) {
             entries = {},
             specFiles = [];
 
+        if (filter) {
+            filter = filter.split(':');
+            fileFilter = filter[0];
+            suiteFilter = filter[1];
+            specFilter = filter[2];
+        }
+
         if (options.norun) {
             options.keepRunner = true;
         }
@@ -60,7 +70,8 @@ module.exports = function (grunt) {
         this.filesSrc.forEach(function (f) {
             var filename = path.basename(f, '.js');
 
-            if (!testFilter || minimatch(f, testFilter, {matchBase: true})) {
+            // Filter out any spec files that don't match the filter.
+            if (!fileFilter || minimatch(f, fileFilter, {matchBase: true})) {
                 specFiles.push(
                     path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
                 );
@@ -87,7 +98,10 @@ module.exports = function (grunt) {
                 failedSpecs = 0,
                 skippedSpecs = 0,
 
-                skippedSuites = 0;
+                skippedSuites = 0,
+
+                ignoreSuite = false,
+                ignoreSpec = false;
 
             // Copy Jasmine files into temp dir.
             [].concat(
@@ -190,6 +204,10 @@ module.exports = function (grunt) {
                 });
 
                 phantomjs.on('jasmine.done', function () {
+                    if (totalSpecs === 0) {
+                        grunt.log.error('No tests found for filter "' + filter.join(':') + '"');
+                        done(false);
+                    }
                     reporter.reportFinish({
                         totalSpecs: totalSpecs,
                         passedSpecs: passedSpecs,
@@ -206,37 +224,53 @@ module.exports = function (grunt) {
                 });
 
                 phantomjs.on('jasmine.suiteStarted', function (suiteMetadata) {
-                    reporter.reportSuiteStarted(suiteMetadata.description);
-                });
-
-                phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
-                    var disabled = suiteMetadata.status === 'disabled';
-                    reporter.reportSuiteDone(disabled);
-
-                    if (disabled) {
-                        skippedSuites++;
+                    if (!suiteFilter || suiteMetadata.description === suiteFilter) {
+                        reporter.reportSuiteStarted(suiteMetadata.description);
+                    } else {
+                        ignoreSuite = true;
                     }
                 });
 
-                phantomjs.on('jasmine.specStarted', function () {
-                    totalSpecs++;
+                phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
+                    if (!ignoreSuite) {
+                        var disabled = suiteMetadata.status === 'disabled';
+                        reporter.reportSuiteDone(disabled);
+
+                        if (disabled) {
+                            skippedSuites++;
+                        }
+                    } else {
+                        ignoreSuite = false;
+                    }
+                });
+
+                phantomjs.on('jasmine.specStarted', function (specMetadata) {
+                    if (!ignoreSuite && (!specFilter || specFilter === specMetadata.description)) {
+                        totalSpecs++;
+                    } else {
+                        ignoreSpec = true;
+                    }
                 });
 
                 phantomjs.on('jasmine.specDone', function (specMetadata) {
-                    var skipped = specMetadata.status === 'pending';
-                    reporter.reportSpec(
-                        specMetadata.description,
-                        skipped,
-                        specMetadata.passedExpectations,
-                        specMetadata.failedExpectations
-                    );
+                    if (!ignoreSuite && !ignoreSpec) {
+                        var skipped = specMetadata.status === 'pending';
+                        reporter.reportSpec(
+                            specMetadata.description,
+                            skipped,
+                            specMetadata.passedExpectations,
+                            specMetadata.failedExpectations
+                        );
 
-                    if (specMetadata.failedExpectations.length !== 0) {
-                        failedSpecs++;
-                    } else if (skipped) {
-                        skippedSpecs++;
+                        if (specMetadata.failedExpectations.length !== 0) {
+                            failedSpecs++;
+                        } else if (skipped) {
+                            skippedSpecs++;
+                        } else {
+                            passedSpecs++;
+                        }
                     } else {
-                        passedSpecs++;
+                        ignoreSpec = false;
                     }
                 });
             } else {

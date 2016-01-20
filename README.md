@@ -112,6 +112,19 @@ jasmine_webpack: {
 }
 ```
 
+### Filtering
+
+It's possible to filter by test files & within that suites & specs. To do that use the `--filter` option when running the task. E.g.
+
+```shell
+> # Filter by test file(s)
+> grunt jasmine_webpack --filter="MyTestFile*"
+> # Filter by suite
+> grunt jasmine_webpack --filter="MyTestFile*:my suite"
+> # Filter by spec
+> grunt jasmine_webpack --filter="MyTestFile*:my suite:my spec"
+```
+
 ## TODO
 
 * Unit tests

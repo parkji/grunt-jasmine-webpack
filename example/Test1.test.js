@@ -1,6 +1,15 @@
 describe('First example', function () {
     xdescribe('skipped suite', function () {});
 
+    describe('filter me', function () {
+        it('should filter', function () {
+            expect(true).toBe(true);
+        });
+        it('should pass', function () {
+            expect(true).toBe(false);
+        });
+    });
+
     describe('truthyness', function () {
         it('should be true for true', function () {
             // Deliberately failing.
