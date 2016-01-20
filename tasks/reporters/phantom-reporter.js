@@ -12,38 +12,31 @@
             /* eslint-enable */
         },
 
-        PhantomReporter = function () {
-            this.started = false;
-            this.finished = false;
-            this.suites = [];
-            this.results = {};
+        PhantomReporter = {
+            jasmineStarted: function () {
+                sendMessage('jasmine.started');
+            },
+
+            jasmineDone: function () {
+                sendMessage('jasmine.done');
+            },
+
+            suiteStarted: function (suiteMetadata) {
+                sendMessage('jasmine.suiteStarted', suiteMetadata);
+            },
+
+            suiteDone: function (suiteMetadata) {
+                sendMessage('jasmine.suiteDone', suiteMetadata);
+            },
+
+            specStarted: function (specMetadata) {
+                sendMessage('jasmine.specStarted', specMetadata);
+            },
+
+            specDone: function (specMetadata) {
+                sendMessage('jasmine.specDone', specMetadata);
+            }
         };
 
-    PhantomReporter.prototype.jasmineStarted = function () {
-        this.started = true;
-        sendMessage('jasmine.started');
-    };
-
-    PhantomReporter.prototype.jasmineDone = function () {
-        this.finished = true;
-        sendMessage('jasmine.done');
-    };
-
-    PhantomReporter.prototype.suiteStarted = function (suiteMetadata) {
-        sendMessage('jasmine.suiteStarted', suiteMetadata);
-    };
-
-    PhantomReporter.prototype.suiteDone = function (suiteMetadata) {
-        sendMessage('jasmine.suiteDone', suiteMetadata);
-    };
-
-    PhantomReporter.prototype.specStarted = function (specMetadata) {
-        sendMessage('jasmine.specStarted', specMetadata);
-    };
-
-    PhantomReporter.prototype.specDone = function (specMetadata) {
-        sendMessage('jasmine.specDone', specMetadata);
-    };
-
-    jasmine.getEnv().addReporter(new PhantomReporter());
+    jasmine.getEnv().addReporter(PhantomReporter);
 }());
