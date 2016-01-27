@@ -132,6 +132,7 @@ It's possible to filter by test files & within that suites & specs. To do that u
 
 ## Release History
 
+* 2016-01-27    v0.4.0    Adds support for filtering suites & specs. Increments jasmine and webpack versions.
 * 2015-11-22    v0.3.0    Adds logging for skipped specs & suites. Use eslint instead of jshint. Upgrade dependencies.
 * 2015-11-02    v0.2.2    Fixes bug where task fails if webpack build fails.
 * 2015-10-19    v0.2.1    Fixes bug with phantomjs not exiting cleanly.
