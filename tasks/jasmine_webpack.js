@@ -28,6 +28,8 @@ module.exports = function (grunt) {
 
             options = this.options({
                 specRunnerDest: '_SpecRunner.html',
+                template: path.join(__dirname, '/templates/SpecRunner.tmpl'),
+                templateOptions: {},
                 keepRunner: false,
                 norun: false,
                 styles: [],
@@ -135,7 +137,8 @@ module.exports = function (grunt) {
 
             grunt.file.write(
                 options.specRunnerDest,
-                _.template(grunt.file.read(path.join(__dirname, '/templates/SpecRunner.tmpl')))({
+                _.template(grunt.file.read(options.template))({
+                    options: options.templateOptions,
                     css: jasmine.files.cssFiles.map(function (cssFile) {
                         return path.relative(outdir, path.join(tempDir, cssFile));
                     }).concat(options.styles.map(function (f) {

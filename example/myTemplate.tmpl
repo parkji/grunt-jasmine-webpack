@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= options.title %></title>
+<% css.forEach(function(style){ %>
+  <link rel="stylesheet" type="text/css" href="<%= style %>">
+<% }) %>
+
+</head>
+<body>
+<% with (scripts) { %>
+  <% [].concat(polyfills, jasmine, boot, vendor, helpers, specs,reporters).forEach(function(script){ %>
+  <script src="<%= script %>"></script>
+  <% }) %>
+<% }; %>
+</body>
+</html>

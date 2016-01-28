@@ -88,6 +88,18 @@ Type: `Array<String>`
 
 CSS stylesheets to include in the spec runner.
 
+#### template
+
+Type: `String`
+
+Template file to use to run the tests. This will be compiled using `_.template()`. Defaults to `grunt-jasmine-webpack/tasks/templates/SpecRunner.tmpl`.
+
+#### templateOptions
+
+Type: `Object`
+
+Any extra options that should be passed to the template file. Note that if no template file is given these will be ignored.
+
 ### Usage examples
 
 ```javascript

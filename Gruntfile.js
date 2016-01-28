@@ -31,6 +31,21 @@ module.exports = function (grunt) {
                     }
                 },
                 src: 'example/**/*.js'
+            },
+            template: {
+                options: {
+                    webpack: {
+                        resolve: {
+                            root: './'
+                        }
+                    },
+                    keepRunner: true,
+                    template: 'example/myTemplate.tmpl',
+                    templateOptions: {
+                        title: 'My template page title'
+                    }
+                },
+                src: 'example/**/*.js'
             }
         }
     });

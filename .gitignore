@@ -3,3 +3,5 @@ npm-debug.log
 tmp
 .idea
 *iml
+.grunt
+_SpecRunner.html
