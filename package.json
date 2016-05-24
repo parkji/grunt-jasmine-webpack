@@ -1,7 +1,7 @@
 {
   "name": "grunt-jasmine-webpack",
   "description": "A plugin to run webpack tests via jasmine",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "https://github.com/parkji/grunt-jasmine-webpack",
   "author": {
     "name": "Ben Parker",
