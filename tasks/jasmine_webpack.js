@@ -54,8 +54,7 @@ module.exports = function (grunt) {
                 }
             }),
 
-            entries = {},
-            specFiles = [];
+            entries = {};
 
         if (filter) {
             filter = filter.split(':');
@@ -74,14 +73,11 @@ module.exports = function (grunt) {
 
             // Filter out any spec files that don't match the filter.
             if (!fileFilter || minimatch(f, fileFilter, {matchBase: true})) {
-                specFiles.push(
-                    path.relative(outdir, path.join(tempDir + '/specs', filename + ".js"))
-                );
                 entries[filename] = f;
             }
         });
 
-        if (specFiles.length === 0) {
+        if (Object.keys(entries).length === 0) {
             grunt.log.error('No tests found');
             done(false);
         }
@@ -146,7 +142,10 @@ module.exports = function (grunt) {
                         return path.relative(outdir, path.join(tempDir, basename));
                     })),
                     scripts: {
-                        specs: specFiles,
+                        specs: Object.keys(stats.compilation.assets)
+                            .map(function(key) { return stats.compilation.assets[key] })
+                            .filter(function(asset) { return asset.emitted })
+                            .map(function(asset) { return asset.existsAt }),
 
                         jasmine: jasmine.files.jsFiles.map(function (jsFile) {
                             return path.relative(outdir, path.join(tempDir, jsFile));
