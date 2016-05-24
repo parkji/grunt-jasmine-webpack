@@ -2,7 +2,7 @@
  * grunt-jasmine-webpack
  * https://github.com/ben/grunt-jasmine-webpack
  *
- * Copyright (c) 2015 Ben Parker
+ * Copyright (c) 2016 Ben Parker
  * Licensed under the MIT license.
  */
 
@@ -46,6 +46,21 @@ module.exports = function (grunt) {
                     }
                 },
                 src: 'example/**/*.js'
+            },
+            coffee: {
+                options: {
+                    webpack: {
+                        resolve: {
+                            root: './'
+                        },
+                        module: {
+                            loaders: [
+                                { test: /\.coffee$/, loader: "coffee-loader" }
+                            ]
+                        }
+                    }
+                },
+                src: 'example/coffee/*.test.coffee'
             }
         }
     });
