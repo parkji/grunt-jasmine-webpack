@@ -75,7 +75,7 @@ module.exports = function (grunt) {
             // Filter out any spec files that don't match the filter.
             if (!fileFilter || minimatch(f, fileFilter, {matchBase: true})) {
                 specFiles.push(
-                    path.relative(outdir, path.join(tempDir + '/specs', path.basename(f)))
+                    path.relative(outdir, path.join(tempDir + '/specs', filename + ".js"))
                 );
                 entries[filename] = f;
             }
