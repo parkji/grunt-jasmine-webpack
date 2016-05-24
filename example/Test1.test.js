@@ -1,3 +1,4 @@
+/* eslint-env jasmine */
 describe('First example', function () {
     xdescribe('skipped suite', function () {});
 
