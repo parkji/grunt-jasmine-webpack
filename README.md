@@ -100,6 +100,24 @@ Type: `Object`
 
 Any extra options that should be passed to the template file. Note that if no template file is given these will be ignored.
 
+#### display
+
+Type: `String`
+
+    * `full` Displays full test description and results
+    * `short` Displays short characters to represent test results
+    * `none` Does not display any test results
+
+Defaults to `'full'`
+
+#### summary
+
+Type: `Boolean`
+
+Will display a count of all passed, failed, and skipped tests
+
+Defaults to `true`
+
 ### Usage examples
 
 ```javascript

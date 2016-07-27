@@ -35,7 +35,9 @@ module.exports = function (grunt) {
                 styles: [],
                 helpers: [],
                 vendor: [],
-                polyfills: []
+                polyfills: [],
+                display: 'full',
+                summary: true
             }),
 
             filter = grunt.option('filter'),
@@ -211,13 +213,20 @@ module.exports = function (grunt) {
                         grunt.log.error('No tests found for filter "' + filter.join(':') + '"');
                         done(false);
                     }
-                    reporter.reportFinish({
-                        totalSpecs: totalSpecs,
-                        passedSpecs: passedSpecs,
-                        failedSpecs: failedSpecs,
-                        skippedSpecs: skippedSpecs,
-                        skippedSuites: skippedSuites
-                    });
+
+                    if (options.display === 'short') {
+                        grunt.log.writeln();
+                    }
+
+                    if (options.summary) {
+                        reporter.reportFinish({
+                            totalSpecs: totalSpecs,
+                            passedSpecs: passedSpecs,
+                            failedSpecs: failedSpecs,
+                            skippedSpecs: skippedSpecs,
+                            skippedSuites: skippedSuites
+                        });
+                    }
                     grunt.verbose.writeln('Halting phantomjs');
                     phantomjs.halt();
                 });
@@ -228,7 +237,9 @@ module.exports = function (grunt) {
 
                 phantomjs.on('jasmine.suiteStarted', function (suiteMetadata) {
                     if (!suiteFilter || suiteMetadata.description === suiteFilter) {
-                        reporter.reportSuiteStarted(suiteMetadata.description);
+                        if (options.display === 'full') {
+                            reporter.reportSuiteStarted(suiteMetadata.description);
+                        }
                     } else {
                         ignoreSuite = true;
                     }
@@ -237,7 +248,10 @@ module.exports = function (grunt) {
                 phantomjs.on('jasmine.suiteDone', function (suiteMetadata) {
                     if (!ignoreSuite) {
                         var disabled = suiteMetadata.status === 'disabled';
-                        reporter.reportSuiteDone(disabled);
+
+                        if (options.display === 'full') {
+                            reporter.reportSuiteDone(disabled);
+                        }
 
                         if (disabled) {
                             skippedSuites++;
@@ -258,12 +272,16 @@ module.exports = function (grunt) {
                 phantomjs.on('jasmine.specDone', function (specMetadata) {
                     if (!ignoreSuite && !ignoreSpec) {
                         var skipped = specMetadata.status === 'pending';
-                        reporter.reportSpec(
-                            specMetadata.description,
-                            skipped,
-                            specMetadata.passedExpectations,
-                            specMetadata.failedExpectations
-                        );
+
+                        if (options.display !== 'none') {
+                            reporter.reportSpec(
+                                specMetadata.description,
+                                skipped,
+                                specMetadata.passedExpectations,
+                                specMetadata.failedExpectations,
+                                options.display
+                            );
+                        }
 
                         if (specMetadata.failedExpectations.length !== 0) {
                             failedSpecs++;

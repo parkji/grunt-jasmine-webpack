@@ -41,36 +41,48 @@ _.extend(Reporter.prototype, {
         }
     },
 
-    reportSpec: function (description, skipped, passedExpectations, failedExpectations) {
+    reportSpec: function (description, skipped, passedExpectations, failedExpectations, display) {
         this.indentLevel++;
 
         if (skipped) {
-            this.grunt.log.writeln(
-                indent(this.indentLevel) +
-                chalk.yellow("SKIPPED: ") +
-                chalk.grey(description)
-            );
+            if (display === 'full') {
+                this.grunt.log.writeln(
+                    indent(this.indentLevel) +
+                    chalk.yellow("SKIPPED: ") +
+                    chalk.grey(description)
+                );
+            } else if (display === 'short') {
+                this.grunt.log.write(chalk.yellow("*"));
+            }
         }
 
         passedExpectations.forEach(function () {
-            this.grunt.log.writeln(
-                indent(this.indentLevel) +
-                chalk.green("PASS: ") +
-                chalk.gray(description)
-            );
+            if (display === 'full') {
+                this.grunt.log.writeln(
+                    indent(this.indentLevel) +
+                    chalk.green("PASS: ") +
+                    chalk.gray(description)
+                );
+            } else if (display === 'short') {
+                this.grunt.log.write(chalk.green("."));
+            }
         }, this);
 
         failedExpectations.forEach(function (expectation) {
-            this.grunt.log.writeln(
-                indent(this.indentLevel) +
-                chalk.red("FAIL: ") +
-                chalk.gray(description)
-            );
+            if (display === 'full') {
+                this.grunt.log.writeln(
+                    indent(this.indentLevel) +
+                    chalk.red("FAIL: ") +
+                    chalk.gray(description)
+                );
 
-            this.grunt.log.writeln(
-                indent(this.indentLevel) +
-                chalk.red(expectation.message)
-            );
+                this.grunt.log.writeln(
+                    indent(this.indentLevel) +
+                    chalk.red(expectation.message)
+                );
+            } else if (display === 'short') {
+                this.grunt.log.write(chalk.red("X"));
+            }
         }, this);
 
         this.indentLevel--;
