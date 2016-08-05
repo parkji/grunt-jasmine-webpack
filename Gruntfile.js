@@ -61,6 +61,17 @@ module.exports = function (grunt) {
                     }
                 },
                 src: 'example/coffee/*.test.coffee'
+            },
+            short: {
+                options: {
+                    webpack: {
+                        resolve: {
+                            root: './'
+                        }
+                    },
+                    display: 'short'
+                },
+                src: 'example/**/*.js'
             }
         }
     });
