@@ -162,6 +162,7 @@ It's possible to filter by test files & within that suites & specs. To do that u
 
 ## Release History
 
+* 2016-08-04    v0.8.0    Merges #17 & adds example for short display.
 * 2016-05-24    v0.7.0    Merges #13 & adds coffee script examples.
 * 2016-02-19    v0.6.0    Bump grunt-lib-phantomjs version
 * 2016-01-29    v0.5.0    Allows custom templates to be used
