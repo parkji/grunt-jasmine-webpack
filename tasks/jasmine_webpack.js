@@ -176,6 +176,19 @@ module.exports = function (grunt) {
             );
 
             if (!options.norun) {
+
+                phantomjs.on('fail.load', function(url) {
+                    phantomjs.halt();
+                    grunt.log.error('PhantomJS unable to load URL.');
+                    done(false);
+                });
+
+                phantomjs.on('fail.timeout', function() {
+                    phantomjs.halt();
+                    grunt.log.error('PhantomJS timed out.');
+                    done(false);
+                });
+
                 // Run tests in phantomjs, if options.norun is false.
                 phantomjs.spawn(options.specRunnerDest, {
                     done: function () {
