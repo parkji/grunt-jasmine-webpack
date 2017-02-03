@@ -32,10 +32,7 @@
     "grunt-contrib-clean": "^0.7.0",
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-eslint": "^18.1.0",
-    "grunt": "~0.4.5"
-  },
-  "peerDependencies": {
-    "grunt": "~0.4.5"
+    "grunt": "~1.0.1"
   },
   "dependencies": {
     "chalk": "1.1.1",
