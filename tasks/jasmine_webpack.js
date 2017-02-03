@@ -177,13 +177,13 @@ module.exports = function (grunt) {
 
             if (!options.norun) {
 
-                phantomjs.on('fail.load', function(url) {
+                phantomjs.on('fail.load', function (url) {
                     phantomjs.halt();
-                    grunt.log.error('PhantomJS unable to load URL.');
+                    grunt.log.error('PhantomJS unable to load URL ' + url);
                     done(false);
                 });
 
-                phantomjs.on('fail.timeout', function() {
+                phantomjs.on('fail.timeout', function () {
                     phantomjs.halt();
                     grunt.log.error('PhantomJS timed out.');
                     done(false);
