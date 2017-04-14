@@ -155,6 +155,10 @@ It's possible to filter by test files & within that suites & specs. To do that u
 > grunt jasmine_webpack --filter="MyTestFile*:my suite:my spec"
 ```
 
+### Development
+
+`npm run lint` will run `ESLint` and should be run before submitting a pull request.
+
 ## TODO
 
 * Unit tests
