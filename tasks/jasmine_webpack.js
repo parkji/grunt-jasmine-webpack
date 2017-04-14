@@ -11,6 +11,7 @@ var path = require('path'),
     _ = require('underscore'),
     webpack = require('webpack'),
     minimatch = require('minimatch'),
+    chalk = require('chalk'),
 
     Reporter = require('./lib/Reporter'),
 
@@ -305,6 +306,12 @@ module.exports = function (grunt) {
                         }
                     } else {
                         ignoreSpec = false;
+                    }
+                });
+
+                phantomjs.on('console', function (msg) {
+                    if (options.display === 'full') {
+                        grunt.log.writeln('\n' + chalk.yellow('log: ') + msg);
                     }
                 });
             } else {
