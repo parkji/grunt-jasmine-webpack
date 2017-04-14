@@ -166,6 +166,7 @@ It's possible to filter by test files & within that suites & specs. To do that u
 
 ## Release History
 
+* 2017-04-14    v0.10.0   Merged #20 - support for console output from tests
 * 2017-02-03    v0.9.0    Merges #19 & fixes #18
 * 2016-08-04    v0.8.0    Merges #17 & adds example for short display.
 * 2016-05-24    v0.7.0    Merges #13 & adds coffee script examples.
