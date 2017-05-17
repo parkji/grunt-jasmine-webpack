@@ -7,7 +7,7 @@
  */
 
 'use strict';
-
+var path = require("path");
 module.exports = function (grunt) {
 
     // Project configuration.
@@ -26,7 +26,9 @@ module.exports = function (grunt) {
                 options: {
                     webpack: {
                         resolve: {
-                            root: './'
+                            modules: [
+                                path.join(__dirname, './')
+                            ]
                         }
                     }
                 },
@@ -36,7 +38,9 @@ module.exports = function (grunt) {
                 options: {
                     webpack: {
                         resolve: {
-                            root: './'
+                            modules: [ 
+                                path.join(__dirname, './')
+                            ]
                         }
                     },
                     keepRunner: true,
@@ -51,7 +55,9 @@ module.exports = function (grunt) {
                 options: {
                     webpack: {
                         resolve: {
-                            root: './'
+                            modules: [
+                                path.join(__dirname, './')
+                            ]
                         },
                         module: {
                             loaders: [
@@ -66,7 +72,9 @@ module.exports = function (grunt) {
                 options: {
                     webpack: {
                         resolve: {
-                            root: './'
+                            modules: [
+                                path.join(__dirname, './')
+                            ]
                         }
                     },
                     display: 'short'

@@ -6,13 +6,13 @@ describe('First example', function () {
         it('should filter', function () {
             expect(true).toBe(true);
         });
-        it('should pass', function () {
+        it('should fail', function () {
             expect(true).toBe(false);
         });
     });
 
     describe('truthyness', function () {
-        it('should be true for true', function () {
+        it('should be true for true (deliberately failing)', function () {
             // Deliberately failing.
             expect(true).toBe(false);
         });

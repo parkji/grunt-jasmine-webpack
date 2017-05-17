@@ -51,7 +51,7 @@ module.exports = function (grunt) {
             webpackConfig = _.defaults(options.webpack || {}, {
                 devtool: 'eval',
                 output: {
-                    path: tempDir + '/specs',
+                    path: path.resolve(tempDir + '/specs'),
                     filename: '[name].js',
                     libraryTarget: 'var'
                 }

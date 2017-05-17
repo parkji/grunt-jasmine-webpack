@@ -5,11 +5,11 @@ describe "First example", ->
         it 'should filter', ->
             expect(true).toBe true
 
-        it 'should pass', ->
+        it 'should fail', ->
             expect(true).toBe false
 
     describe 'truthyness', ->
-        it 'should be true for true', ->
+        it 'should be true for true (deliberately failing)', ->
             # Deliberately failing
             expect(true).toBe false
 
