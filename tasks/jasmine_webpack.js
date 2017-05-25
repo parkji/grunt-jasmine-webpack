@@ -36,7 +36,7 @@ module.exports = function (grunt) {
                 styles: [],
                 helpers: [],
                 vendor: [],
-                polyfills: [],
+                polyfills: [path.join(__dirname, "../node_modules/es6-promise-polyfill/promise.min.js")],
                 display: 'full',
                 summary: true
             }),
@@ -90,6 +90,11 @@ module.exports = function (grunt) {
         }
 
         webpackConfig.entry = entries;
+
+        // Webpack 2 changed most plugins to be ES6 classes, so this.options()
+        // returns an object and the apply function is not present.
+        // Use .getRaw to get the actual instances of the plugins
+        webpackConfig.plugins = grunt.config.getRaw([this.name, this.target, 'options', 'webpack', 'plugins']);
 
         webpack(webpackConfig, function (err, stats) {
             if (stats.hasErrors()) {
