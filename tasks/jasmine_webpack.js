@@ -39,7 +39,8 @@ module.exports = function (grunt) {
                 vendor: [],
                 polyfills: [promisePolyfillPath],
                 display: 'full',
-                summary: true
+                summary: true,
+                timeout: null
             }),
 
             filter = grunt.option('filter'),
@@ -198,6 +199,9 @@ module.exports = function (grunt) {
 
                 // Run tests in phantomjs, if options.norun is false.
                 phantomjs.spawn(options.specRunnerDest, {
+                    options: {
+                        timeout: options.timeout
+                    },
                     done: function () {
                         // Clean up.
                         if (!options.keepRunner) {

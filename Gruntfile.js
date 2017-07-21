@@ -80,6 +80,19 @@ module.exports = function (grunt) {
                     display: 'short'
                 },
                 src: 'example/**/*.js'
+            },
+            timeout: {
+                options: {
+                    webpack: {
+                        resolve: {
+                            modules: [
+                                path.join(__dirname, './')
+                            ]
+                        }
+                    },
+                    timeout: 10000
+                },
+                src: 'example/**/*.js'
             }
         }
     });
