@@ -24,8 +24,7 @@ module.exports = function (grunt) {
     var reporter = new Reporter(grunt);
 
     grunt.registerMultiTask('jasmine_webpack', 'A plugin to run webpack tests via jasmine', function () {
-        var promisePolyfillPath = require.resolve('es6-promise-polyfill')
-                           .match(/.*\/node_modules\/[^/]+\//)[0] + "promise.min.js",
+        var promisePolyfillPath = require.resolve('es6-promise-polyfill'),
             done = this.async(),
             phantomjs = require('grunt-lib-phantomjs').init(grunt),
 
