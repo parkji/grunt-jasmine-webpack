@@ -118,6 +118,14 @@ Will display a count of all passed, failed, and skipped tests
 
 Defaults to `true`
 
+#### timeout
+
+Type: `Number`
+
+Number of milliseconds for PhantomJS to wait before timing out and failing the suite.
+
+Defaults to `5000`
+
 ### Usage examples
 
 ```javascript
